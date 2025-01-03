@@ -14,7 +14,10 @@ interface Props {
   board: IBoard;
   isLoggedIn: boolean;
   isPowerUser: boolean;
+  currentUserFullName: string;
   tenantSetting: ITenantSetting;
+  componentRenderedAt: number;
+  postStatusesToShowInFilter: Array<number>;
   authenticityToken: string;
 }
 
@@ -32,7 +35,10 @@ class BoardRoot extends React.Component<Props> {
       board,
       isLoggedIn,
       isPowerUser,
+      currentUserFullName,
       tenantSetting,
+      componentRenderedAt,
+      postStatusesToShowInFilter,
       authenticityToken,
     } = this.props;
 
@@ -42,7 +48,10 @@ class BoardRoot extends React.Component<Props> {
           board={board}
           isLoggedIn={isLoggedIn}
           isPowerUser={isPowerUser}
+          currentUserFullName={currentUserFullName}
           tenantSetting={tenantSetting}
+          componentRenderedAt={componentRenderedAt}
+          postStatusesToShowInFilter={postStatusesToShowInFilter}
           authenticityToken={authenticityToken}
         />
       </Provider>

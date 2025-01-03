@@ -1,9 +1,13 @@
 ###
 ### Build stage ###
 ###
-FROM ruby:2.6.6 AS builder
+FROM ruby:3.0.6 AS builder
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg
+RUN mkdir -p /etc/apt/keyrings && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 RUN npm install -g yarn
 RUN gem install bundler -v 2.3
@@ -33,21 +37,17 @@ RUN yarn install --check-files
 # Copy all files
 COPY . ${APP_ROOT}/
 
+# Build Swagger API documentation
+RUN RSWAG_SWAGGERIZE=true RAILS_ENV=test bundle exec rake rswag:specs:swaggerize
+
 # Compile assets if production
 # SECRET_KEY_BASE=1 is a workaround (see https://github.com/rails/rails/issues/32947)
-RUN if [ "$ENVIRONMENT" = "production" ]; then RAILS_ENV=development bundle exec rake webpacker:compile; fi
+RUN if [ "$ENVIRONMENT" = "production" ]; then SECRET_KEY_BASE=1 ./bin/rails assets:precompile; fi
 
 ###
 ### Dev stage ###
 ###
 FROM builder AS dev
-
-# Install Foreman to launch multiple processes from Procfile
-RUN gem install foreman
-
-# Install Google Chrome to run system specs
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
 
 ENTRYPOINT ["./docker-entrypoint-dev.sh"]
 
@@ -56,7 +56,7 @@ EXPOSE 3000
 ###
 ### Prod stage ###
 ###
-FROM ruby:2.6.6-slim AS prod
+FROM ruby:3.0.6-slim AS prod
 
 RUN apt-get update -qq && \
   apt-get install -yq  \
@@ -91,7 +91,11 @@ COPY --from=builder ${APP_ROOT}/Gemfile.lock ${APP_ROOT}/
 COPY --from=builder ${APP_ROOT}/.ruby-version ${APP_ROOT}/
 COPY --from=builder ${APP_ROOT}/config.ru ${APP_ROOT}/
 COPY --from=builder ${APP_ROOT}/Rakefile ${APP_ROOT}/
+COPY --from=builder ${APP_ROOT}/lib/tasks/ ${APP_ROOT}/lib/tasks/
 COPY --from=builder /usr/local/bundle/config /usr/local/bundle/config
+
+# Copy Swagger API documentation
+COPY --from=builder ${APP_ROOT}/swagger/ ${APP_ROOT}/swagger/
 
 ENTRYPOINT ["./docker-entrypoint-prod.sh"]
 

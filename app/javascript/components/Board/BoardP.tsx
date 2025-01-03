@@ -5,18 +5,25 @@ import SearchFilter from './SearchFilter';
 import PostStatusFilter from './PostStatusFilter';
 import PostList from './PostList';
 import Sidebar from '../common/Sidebar';
+import SortByFilter from './SortByFilter';
+import DateFilter from './DateFilter';
+import PoweredByLink from '../common/PoweredByLink';
 
 import IBoard from '../../interfaces/IBoard';
 import ITenantSetting from '../../interfaces/ITenantSetting';
 
 import { PostsState } from '../../reducers/postsReducer';
 import { PostStatusesState } from '../../reducers/postStatusesReducer';
+import { SortByFilterValues } from '../../actions/changeFilters';
 
 interface Props {
   board: IBoard;
   isLoggedIn: boolean;
   isPowerUser: boolean;
+  currentUserFullName: string;
   tenantSetting: ITenantSetting;
+  componentRenderedAt: number;
+  postStatusesToShowInFilter: Array<number>;
   authenticityToken: string;
   posts: PostsState;
   postStatuses: PostStatusesState;
@@ -25,18 +32,22 @@ interface Props {
     boardId: number,
     page?: number,
     searchQuery?: string,
-    postStatusId?: number,
+    postStatusIds?: Array<number>,
+    sortBy?: SortByFilterValues,
+    date?: { startDate: string; endDate: string },
   ): void;
   requestPostStatuses(): void;
   handleSearchFilterChange(searchQuery: string): void;
   handlePostStatusFilterChange(postStatusId: number): void;
+  handleSortByFilterChange(sortBy: SortByFilterValues): void;
+  handleDateFilterChange(startDate: string, endDate: string): void;
 }
 
 class BoardP extends React.Component<Props> {
   searchFilterTimeoutId: ReturnType<typeof setTimeout>;
 
   componentDidMount() {
-    this.props.requestPosts(this.props.board.id);
+    this.props.requestPosts(this.props.board.id, 1, '', null, this.props.posts.filters.sortBy);
     this.props.requestPostStatuses();
   }
 
@@ -44,21 +55,37 @@ class BoardP extends React.Component<Props> {
     const { searchQuery } = this.props.posts.filters;
     const prevSearchQuery = prevProps.posts.filters.searchQuery;
 
-    const { postStatusId } = this.props.posts.filters;
-    const prevPostStatusId = prevProps.posts.filters.postStatusId;
+    const { postStatusIds } = this.props.posts.filters;
+    const prevPostStatusIds = prevProps.posts.filters.postStatusIds;
+
+    const { sortBy } = this.props.posts.filters;
+    const prevSortBy = prevProps.posts.filters.sortBy;
+
+    const { startDate, endDate } = this.props.posts.filters.date;
+    const prevStartDate = prevProps.posts.filters.date.startDate;
+    const prevEndDate = prevProps.posts.filters.date.endDate;
+
+    const requestPostsWithFilters = () => (
+      this.props.requestPosts(this.props.board.id, 1, searchQuery, postStatusIds, sortBy, { startDate, endDate })
+    );
 
     // search filter changed
     if (searchQuery !== prevSearchQuery) {
       if (this.searchFilterTimeoutId) clearInterval(this.searchFilterTimeoutId);
 
       this.searchFilterTimeoutId = setTimeout(() => (
-        this.props.requestPosts(this.props.board.id, 1, searchQuery, postStatusId)
+        requestPostsWithFilters()
       ), 500);
     }
 
-    // post status filter changed
-    if (postStatusId !== prevPostStatusId) {
-      this.props.requestPosts(this.props.board.id, 1, searchQuery, postStatusId);
+    // poststatus/sortby/date filter changed
+    if (
+      postStatusIds.length !== prevPostStatusIds.length ||
+      sortBy !== prevSortBy ||
+      startDate !== prevStartDate ||
+      endDate !== prevEndDate
+    ) {
+      requestPostsWithFilters();
     }
   }
 
@@ -67,7 +94,10 @@ class BoardP extends React.Component<Props> {
       board,
       isLoggedIn,
       isPowerUser,
+      currentUserFullName,
       tenantSetting,
+      componentRenderedAt,
+      postStatusesToShowInFilter,
       authenticityToken,
       posts,
       postStatuses,
@@ -75,6 +105,8 @@ class BoardP extends React.Component<Props> {
       requestPosts,
       handleSearchFilterChange,
       handlePostStatusFilterChange,
+      handleSortByFilterChange,
+      handleDateFilterChange,
     } = this.props;
     const { filters } = posts;
 
@@ -84,20 +116,48 @@ class BoardP extends React.Component<Props> {
           <NewPost
             board={board}
             isLoggedIn={isLoggedIn}
+            currentUserFullName={currentUserFullName}
+            isAnonymousFeedbackAllowed={tenantSetting.allow_anonymous_feedback}
+            componentRenderedAt={componentRenderedAt}
             authenticityToken={authenticityToken}
           />
-          <SearchFilter
-            searchQuery={filters.searchQuery}
-            handleChange={handleSearchFilterChange}
-          />
-          <PostStatusFilter
-            postStatuses={postStatuses.items}
-            areLoading={postStatuses.areLoading}
-            error={postStatuses.error}
 
-            currentFilter={filters.postStatusId}
-            handleFilterClick={handlePostStatusFilterChange}
-          />
+          <div className="sidebarFilters">
+            <SearchFilter
+              searchQuery={filters.searchQuery}
+              handleChange={handleSearchFilterChange}
+            />
+            {
+              isPowerUser &&
+              <>
+              <SortByFilter
+                sortBy={filters.sortBy}
+                handleChange={sortBy => handleSortByFilterChange(sortBy)}
+              />
+
+              <DateFilter
+                startDate={filters.date.startDate}
+                endDate={filters.date.endDate}
+                handleChange={handleDateFilterChange}
+              />
+              </>
+            }
+            {
+              postStatusesToShowInFilter.length > 0 &&
+                <PostStatusFilter
+                  postStatuses={postStatuses.items.filter(postStatus => postStatusesToShowInFilter.includes(postStatus.id))}
+                  areLoading={postStatuses.areLoading}
+                  error={postStatuses.error}
+
+                  currentFilter={filters.postStatusIds}
+                  handleFilterClick={handlePostStatusFilterChange}
+
+                  showNoStatusFilter={postStatusesToShowInFilter.includes(null)}
+                />
+            }
+          </div>
+
+          { tenantSetting.show_powered_by && <PoweredByLink /> }
         </Sidebar>
 
         <PostList
@@ -113,7 +173,7 @@ class BoardP extends React.Component<Props> {
             posts.areLoading ?
               null
             :
-              requestPosts(board.id, posts.page + 1, filters.searchQuery, filters.postStatusId)
+              requestPosts(board.id, posts.page + 1, filters.searchQuery, filters.postStatusIds)
           }
 
           isLoggedIn={isLoggedIn}

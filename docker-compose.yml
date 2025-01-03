@@ -1,8 +1,7 @@
-version: '3.4'
 services:
   db:
     image: postgres:14.5
-    environment:
+    environment: &db-env
       POSTGRES_USER: astuto
       POSTGRES_PASSWORD: dbpass
     volumes:
@@ -13,16 +12,13 @@ services:
       dockerfile: Dockerfile
       target: dev
     environment:
-      POSTGRES_USER: astuto
-      POSTGRES_PASSWORD: dbpass
+      <<: *db-env
       BASE_URL: http://localhost:3000
       SECRET_KEY_BASE: secretkeybasehere
-    volumes:
-      - .:/astuto
     ports:
       - "3000:3000"
     depends_on:
       - db
-    
+
 volumes:
   dbdata:

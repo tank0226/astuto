@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { LikeIcon, SolidLikeIcon } from '../common/Icons';
 
 interface Props {
   postId: number;
@@ -6,6 +7,7 @@ interface Props {
   showLikeCount?: boolean;
   showLikeButton?: boolean;
   liked: number;
+  size: 'medium' | 'large';
   handleLikeSubmit(
     postId: number,
     isLike: boolean,
@@ -21,6 +23,7 @@ const LikeButtonP = ({
   showLikeCount = true,
   showLikeButton = true,
   liked,
+  size,
   handleLikeSubmit,
   authenticityToken,
   isLoggedIn,
@@ -35,8 +38,9 @@ const LikeButtonP = ({
       className={`likeButton${liked ? ' liked' : ''}`}
       hidden={!showLikeButton}
     >
+      { liked ? <SolidLikeIcon size={size === 'medium' ? 26 : 34} /> : <LikeIcon size={size === 'medium' ? 26 : 34} />}
     </div>
-    { showLikeCount && <span className="likeCountLabel">{likeCount}</span> }
+    { showLikeCount && <span className={`likeCountLabel likeCountLabel-${size}`}>{likeCount}</span> }
   </div>
 );
 

@@ -1,46 +1,64 @@
-<p align="center"><img width="400" src="./images/logo-and-name.png" /></p>
 <p align="center">
-  <img alt="GitHub" src="https://img.shields.io/github/license/riggraz/astuto?color=black&style=flat">
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/riggraz/astuto?color=black&style=flat">
+  <a href="https://astuto.io/?utm_campaign=github_logo&utm_source=github.com">
+    <img width="400" src="./images/logo-and-name.png" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://www.producthunt.com/posts/astuto?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-astuto" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=179870&theme=neutral&period=daily" alt="Astuto - An open source customer feedback tool 🦊 | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" /></a>
   <br>
-  <a href="https://www.producthunt.com/posts/astuto?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-astuto" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=179870&theme=dark&period=daily" alt="Astuto - An open source customer feedback tool 🦊 | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" /></a>
+  <h3 align="center">
+    <a href="https://feedback.astuto.io/">✨ Try it out</a>
+    &nbsp;•&nbsp;
+    <a href="https://astuto.io/?utm_campaign=github_learnmore&utm_source=github.com">📖 Learn more</a>
+  </h3>
 </p>
 
-<h3 align="center"><a href="http://65.21.148.99:3000/">Try the demo out</a></h3>
-<h5 align="center">To login as administrator:<br />email: admin@example.com | pass: password</h5>
+Astuto is an open source customer feedback tool. It helps you collect, manage and prioritize feedback from your customers, so you can build a better product.
 
-## What is Astuto?
-
-Astuto is a free, open source, self-hosted customer feedback tool. It helps you collect, manage and prioritize feedback from your users. It has been heavely inspired by [Canny.io](https://canny.io/) ("astuto", indeed, is the italian translation of the word "canny").
-
-<img src="./images/featured-image.png" />
+<a href="https://feedback.astuto.io/">
+  <img src="./images/hero-image.png" />
+</a>
 
 ## Features
 
-* Collect and manage feedback
-* Create custom boards and statuses, to better organize feedback
-* Customize your roadmap, to let your users know what you're working on
-* Many more...
+- **Roadmap**: show users what you're working on
+- **Simple Sign In**: let users log in with email or any OAuth2 provider
+- **Webhooks**: integrate with your existing tools (e.g. Jira, Trello, Slack)
+- **API**: programmatically manage your feedback space with our REST API
+- **Moderation Queue**: decide whether to show new feedback immediately or request approval
+- **Anonymous Feedback**: enable unregistered users to publish feedback
+- **... and more**: invitation system, brand customization, recap emails for administrators, private site settings, and more!
 
-## Requirements
+## Get started
 
-* Docker
-* Docker Compose
+### Hosted
 
-You can install [Docker Desktop](https://docs.docker.com/desktop/) which includes everything you need to run Astuto. If you are on Linux, you may instead install Docker Engine, Docker CLI and then install the [Docker Compose Plugin](https://docs.docker.com/compose/install/).
+We offer a hosted solution, so you don't have to provision your own server. This is the easiest and fastest way to get started: you can sign up and start collecting feedback in a few minutes.
 
-## Installation
+[Start your 7-day free trial](https://login.astuto.io/signup) without entering any payment method, then it's 15 €/month with annual subscription or 20 €/month with monthly subscription. [Learn more on astuto.io](https://astuto.io/?utm_campaign=github_getstarted&utm_source=github.com).
 
-### DockerHub image (fastest, for production)
+With the paid plan:
 
+- You avoid deployment hassles like renting a server, issuing SSL certificates, configuring a mail server and managing updates
+- You get some OAuth providers out of the box: Google, Facebook and GitHub are ready to log your users in, no configuration needed
+- You get priority support
+- You support open source and get our eternal gratitude :)
+
+
+### Self-hosted
+
+Read the [Deploy with Docker instructions](https://docs.astuto.io/deploy-docker) for the most comprehensive and up to date guide on installing and configuring Astuto.
+
+What you find below are minimal instructions to get you started as quickly as possible:
+
+0. Ensure you have Docker and Docker Compose installed
 1. Create an empty folder
 2. Inside that folder, create a `docker-compose.yml` file with the following content:
 ```
-version: '3.4'
 services:
   db:
     image: postgres:14.5
-    environment:
+    environment: &db-env
       POSTGRES_USER: yourpostgresusername
       POSTGRES_PASSWORD: yourpostgrespassword
     volumes:
@@ -48,8 +66,7 @@ services:
   web:
     image: riggraz/astuto:latest
     environment:
-      POSTGRES_USER: yourpostgresusername
-      POSTGRES_PASSWORD: yourpostgrespassword
+      <<: *db-env
       BASE_URL: http://yourwebsite.com
       SECRET_KEY_BASE: yoursecretkeybase
     ports:
@@ -60,27 +77,26 @@ services:
 volumes:
   dbdata:
 ```
-3. Edit the environment variables to fit your needs
-4. Run `docker compose pull`
-5. Run `docker compose up`
-6. You should now have a running instance of Astuto on port 3000. A default user account has been created with credentials email: `admin@example.com`, password: `password`.
+3. Edit the environment variables to fit your needs. You can find more information about env variables in the [documentation](https://docs.astuto.io/deploy-docker/#2-edit-environment-variables).
+4. Run `docker compose pull && docker compose up`
+5. You should now have a running instance of Astuto on port 3000. A default user account has been created with credentials email: `admin@example.com`, password: `password`.
 
-**Note**: if you are on Linux and you encounter permission denied errors when running Docker commands, try to run them as administrator.
+## Documentation
 
-### GitHub repository (for development)
-
-**Note**: this installation method is suggested for developers and contributors. If you just want to deploy your Astuto instance or try it out, we recommend to follow the above DockerHub installation instructions.
-
-See [contributing guidelines](https://github.com/riggraz/astuto/blob/main/CONTRIBUTING.md).
+Check out [docs.astuto.io](https://docs.astuto.io/) to learn how to deploy Astuto, configure custom OAuth providers and webhooks, use our REST API and more!
 
 ## Contributing
 
-You are welcome to contribute:
-* Read our [contributing guidelines](https://github.com/riggraz/astuto/blob/main/CONTRIBUTING.md)
-* Join the [Discord channel](https://discord.gg/SrtUMRp) to get in touch
+There are many ways to contribute to Astuto, not just coding. Proposing features, reporting issues, translating to a new language or improving documentation are a few examples! Please read our [contributing guidelines](https://github.com/riggraz/astuto/blob/main/CONTRIBUTING.md) to learn more.
 
-A huge thank you to all people who contributed:
+## Credits
+
+Astuto logo and all image assets are credited [here](https://astuto.io/credits).
+
+A huge thank you to code contributors
 
 <a href="https://github.com/riggraz/astuto/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=riggraz/astuto" />
 </a>
+
+and [translation contributors](https://crowdin.com/project/astuto/members)!

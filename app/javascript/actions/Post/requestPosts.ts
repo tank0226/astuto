@@ -4,6 +4,7 @@ import { ThunkAction } from 'redux-thunk';
 import IPostJSON from '../../interfaces/json/IPost';
 
 import { State } from '../../reducers/rootReducer';
+import { SortByFilterValues } from '../changeFilters';
 
 export const POSTS_REQUEST_START = 'POSTS_REQUEST_START';
 interface PostsRequestStartAction {
@@ -48,7 +49,9 @@ export const requestPosts = (
   boardId: number,
   page: number,
   searchQuery: string,
-  postStatusId: number,
+  postStatusIds: Array<number>,
+  sortBy: SortByFilterValues,
+  date: { startDate: string; endDate: string },
 ): ThunkAction<void, State, null, Action<string>> => async (dispatch) => {
   dispatch(postsRequestStart());
 
@@ -57,11 +60,37 @@ export const requestPosts = (
     params += `page=${page}`;
     params += `&board_id=${boardId}`;
     if (searchQuery) params += `&search=${searchQuery}`;
-    if (postStatusId) params += `&post_status_id=${postStatusId}`;
+    if (postStatusIds) {
+      params += '&';
+
+      for (let i = 0; i < postStatusIds.length; i++) {
+        params += `post_status_ids[]=${postStatusIds[i]}`;
+        if (i !== postStatusIds.length-1) params += '&';
+      }
+    }
+    if (sortBy) params += `&sort_by=${sortBy}`;
+    if (date.startDate) params += `&start_date=${date.startDate}`;
+    if (date.endDate) params += `&end_date=${date.endDate}`;
 
     const response = await fetch(`/posts?${params}`);
     const json = await response.json();
     dispatch(postsRequestSuccess(json, page));
+  } catch (e) {
+    dispatch(postsRequestFailure(e));
+  }
+}
+
+// Used to get posts that require moderation (i.e. pending or rejected posts)
+export const requestPostsForModeration = (
+
+): ThunkAction<void, State, null, Action<string>> => async (dispatch) => {
+  dispatch(postsRequestStart());
+
+  try {
+    const response = await fetch('/posts/moderation');
+    const json = await response.json();
+
+    dispatch(postsRequestSuccess(json, 1));
   } catch (e) {
     dispatch(postsRequestFailure(e));
   }

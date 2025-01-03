@@ -6,7 +6,6 @@ import { DescriptionText } from '../../common/CustomTexts';
 
 import DragZone from '../../common/DragZone';
 import PostBoardLabel from '../../common/PostBoardLabel';
-import Separator from '../../common/Separator';
 import BoardForm from './BoardForm';
 import ActionLink from '../../common/ActionLink';
 import { CancelIcon, DeleteIcon, EditIcon } from '../../common/Icons';
@@ -15,13 +14,15 @@ interface Props {
   id: number;
   name: string;
   description?: string;
+  slug?: string;
   index: number;
   settingsAreUpdating: boolean;
 
   handleUpdate(
     id: number,
-    description: string,
     name: string,
+    description: string,
+    slug: string,
     onSuccess: Function,
   ): void;
   handleDelete(id: number): void;
@@ -47,11 +48,12 @@ class BoardsEditable extends React.Component<Props, State> {
     this.setState({editMode: !this.state.editMode});
   }
 
-  handleUpdate(id: number, name: string, description: string) {
+  handleUpdate(id: number, name: string, description: string, slug: string) {
     this.props.handleUpdate(
       id,
       name,
       description,
+      slug,
       () => this.setState({editMode: false}),
     );
   }
@@ -61,6 +63,7 @@ class BoardsEditable extends React.Component<Props, State> {
       id,
       name,
       description,
+      slug,
       index,
       settingsAreUpdating,
       handleDelete,
@@ -94,7 +97,7 @@ class BoardsEditable extends React.Component<Props, State> {
                   </ActionLink>
 
                   <ActionLink
-                    onClick={() => confirm(I18n.t('common.confirmation')) && handleDelete(id)}
+                    onClick={() => confirm(I18n.t('common.confirmation_board_delete', { board: name }) + " " + I18n.t('common.confirmation')) && handleDelete(id)}
                     icon={<DeleteIcon />}
                     customClass="deleteAction"
                   >
@@ -109,6 +112,7 @@ class BoardsEditable extends React.Component<Props, State> {
                   id={id}
                   name={name}
                   description={description}
+                  slug={slug}
                   handleUpdate={this.handleUpdate}
                 />
 

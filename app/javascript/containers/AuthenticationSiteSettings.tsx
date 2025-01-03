@@ -8,6 +8,9 @@ import AuthenticationSiteSettingsP from "../components/SiteSettings/Authenticati
 import { ISiteSettingsOAuthForm } from "../components/SiteSettings/Authentication/OAuthForm";
 import { IOAuth } from "../interfaces/IOAuth";
 import { State } from "../reducers/rootReducer";
+import { updateDefaultOAuth } from "../actions/OAuth/updateDefaultOAuth";
+import { TenantSettingEmailRegistrationPolicy } from "../interfaces/ITenantSetting";
+import { updateTenant } from "../actions/Tenant/updateTenant";
 
 const mapStateToProps = (state: State) => ({
   oAuths: state.oAuths,
@@ -33,8 +36,26 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch(updateOAuth({id, isEnabled, authenticityToken}));
   },
 
+  onToggleEnabledDefaultOAuth(id: number, isEnabled: boolean, authenticityToken: string) {
+    dispatch(updateDefaultOAuth({id, isEnabled, authenticityToken}));
+  },
+
   onDeleteOAuth(id: number, authenticityToken: string) {
     dispatch(deleteOAuth(id, authenticityToken));
+  },
+
+  onUpdateTenantSettings(
+    emailRegistrationPolicy: TenantSettingEmailRegistrationPolicy,
+    allowedEmailDomains: string,
+    authenticityToken: string,
+  ): Promise<any> {
+    return dispatch(updateTenant({
+      tenantSetting: {
+        email_registration_policy: emailRegistrationPolicy,
+        allowed_email_domains: allowedEmailDomains,
+      },
+      authenticityToken,
+    }));
   },
 });
 

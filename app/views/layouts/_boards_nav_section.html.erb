@@ -3,17 +3,17 @@
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Boards
     </a>
-    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <ul class="dropdown-menu boards-dropdown" aria-labelledby="navbarDropdown">
       <% boards.each do |board| %>
         <li>
-          <%= link_to board.name, board_path(board), class: 'dropdown-item py-2' %>
+          <%= link_to board.name, @header_full_urls ? get_url_for(method(:board_url), resource: board) : board_path(board), class: 'dropdown-item' %>
         </li>
       <% end %>
     </ul>
 <% else %>
   <% boards.each do |board| %>
     <li class="nav-item<%= board.id == @board.id ? ' active' : '' unless @board.nil? %>">
-      <%= link_to board.name, board_path(board), class: 'nav-link' %>
+      <%= link_to board.name, @header_full_urls ? get_url_for(method(:board_url), resource: board) : board_path(board), class: 'nav-link' %>
     </li>
   <% end %>
 <% end %>

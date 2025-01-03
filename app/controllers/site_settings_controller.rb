@@ -1,13 +1,13 @@
 class SiteSettingsController < ApplicationController
   include ApplicationHelper
 
-  before_action :authenticate_admin,
-    only: [:general, :boards, :post_statuses, :roadmap, :authentication]
-
-  before_action :authenticate_moderator,
-    only: [:users]
+  before_action :authenticate_admin
+  before_action :set_page_title
   
   def general
+  end
+
+  def authentication
   end
 
   def boards
@@ -19,9 +19,19 @@ class SiteSettingsController < ApplicationController
   def roadmap
   end
 
-  def users
+  def webhooks
   end
 
-  def authentication
+  def invitations
+    @invitations = Invitation.all.order(updated_at: :desc)
   end
+
+  def appearance
+  end
+
+  private
+
+    def set_page_title
+      @page_title = t('header.menu.site_settings')
+    end
 end

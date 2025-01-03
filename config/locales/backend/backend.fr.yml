@@ -1,17 +1,19 @@
 fr:
   errors:
-    unknown: 'An unknown error occurred'
+    unknown: 'L''opération a échoué pour une raison inconnue'
     unauthorized: 'Vous n’êtes pas autorisé'
+    email_domain_not_allowed: 'You cannot register with the provided email address'
     not_logged_in: 'Vous devez être connecté pour accéder à cette page'
     not_enough_privileges: 'Vous n''avez pas les privilèges pour accéder à cette page'
     user_blocked_or_deleted: 'Vous ne pouvez pas accéder à votre compte parce qu''il a été bloqué ou supprimé.'
-    o_auth_login_error: 'There was an error logging in with %{name}. Please contact the site administrator or try a different provider.'
+    o_auth_login_error: 'Une erreur s''est produite lors de la connexion avec %{name}. Veuillez contacter l''administrateur du site ou essayer un autre fournisseur.'
     board:
       update_order: 'Il y a eu une erreur dans la réorganisation des panneaux'
     post_status:
       update_order: 'Il y a eu une erreur dans la réorganisation des statuts'
   defaults:
-    user_full_name: 'Anonymous User'
+    user_full_name: 'Utilisateur anonyme'
+    deleted_user_full_name: 'Utilisateur supprimé'
   mailers:
     devise:
       welcome_greeting: 'Bienvenue sur %{site_name}, %{email} !'
@@ -30,23 +32,47 @@ fr:
         body3: "Votre mot de passe ne changera pas tant que vous n'aurez pas accédé au lien ci-dessus et créé un nouveau mot de passe."
         action: 'Changer mon mot de passe'
     user:
-      opening_greeting: 'Bonjour !'
+      opening_greeting: 'Bonjour %{name} !'
       closing_greeting: 'Passez une bonne journée !'
       learn_more: 'Cliquez ici pour en savoir plus'
-      unsubscribe: 'Inutile ? Vous pouvez désactiver les notifications ici'
+      unsubscribe_from_post_html: 'Agacé ? Vous pouvez désactiver les notifications pour ce post %{href}'
+      unsubscribe_from_site_html: 'Agacé ? Vous pouvez désactiver toutes les notifications %{href}'
+      unsubscribe_link: 'ici'
       notify_post_owner:
-        subject: '%{app_name} Nouveau commentaire sur %{post}'
-        body: 'Il y a un nouveau commentaire de %{user} sur votre publication %{post}'
+        subject: '[%{site_name}] Nouveau commentaire sur "%{post}"'
+        body_html: 'Il y a un nouveau commentaire de <b>%{user}</b> sur votre publication <b>%{post}</b>'
       notify_comment_owner:
-        subject: '%{app_name} Nouvelle réponse à votre commentaire de %{post}'
-        body: 'Il y a une nouvelle réponse de %{user} sur votre commentaire du post %{post}'
-      notify_followers_of_post_update:
-        subject: '%{app_name} Nouvelle mise à jour pour la publication %{post}'
-        body: "Il y a une nouvelle mise à jour sur la publication que vous suivez %{post}"
-      notify_followers_of_post_status_change:
-        subject: '[%{app_name}] Changement de statut sur la publication %{post}'
-        body: "La publication que vous suivez %{post} a un nouveau statut"
+        subject: '[%{site_name}] Nouvelle réponse à votre commentaire de %{post}'
+        body_html: 'Il y a une nouvelle réponse par <b>%{user}</b> à votre commentaire sur le post <b>%{post}</b>'
+      notify_follower_of_post_update:
+        subject: '[%{site_name}] Nouvelle mise à jour pour la publication" %{post}"'
+        body_html: 'Il y a une nouvelle mise à jour sur la publication que vous suivez <b>%{post}</b>'
+      notify_follower_of_post_status_change:
+        subject: '[%{site_name}] Statut changé sur le post "%{post}"'
+        body_html: 'Il y a une nouvelle mise à jour sur la publication que vous suivez <b>%{post}</b>'
   activerecord:
+    models:
+      board:
+        one: 'Panneau'
+        other: 'Tableaux'
+      comment:
+        one: 'Commentaire'
+        other: 'Commentaires'
+      like:
+        one: 'Vote'
+        other: 'Votes'
+      o_auth:
+        one: 'OAuth'
+        other: 'OAuth'
+      post_status:
+        one: 'Status'
+        other: 'Statuts'
+      post:
+        one: 'Poster'
+        other: 'Publications'
+      user:
+        one: 'Utilisateur'
+        other: 'Utilisateurs'
     attributes:
       board:
         name: 'Nom'
@@ -67,15 +93,15 @@ fr:
       o_auth:
         name: 'Nom'
         logo: 'Logo'
-        is_enabled: 'Enabled'
-        client_id: 'Client ID'
-        client_secret: 'Client secret'
-        authorize_url: 'Authorize URL'
+        is_enabled: 'Activé'
+        client_id: 'ID client'
+        client_secret: 'Secret client'
+        authorize_url: 'Autoriser l''URL'
         token_url: 'Token URL'
-        profile_url: 'Profile URL'
-        scope: 'Scope'
-        json_user_name_path: 'JSON path to user name'
-        json_user_email_path: 'JSON path to user email'
+        profile_url: 'URL du Profil'
+        scope: 'Portée'
+        json_user_name_path: 'Chemin JSON du nom d''utilisateur'
+        json_user_email_path: 'Chemin JSON de l''adresse email'
       post_status:
         name: 'Nom'
         color: 'Couleur '
@@ -84,6 +110,10 @@ fr:
       post:
         title: 'Titre'
         description: 'Description'
+        approval_status: 'Statut d''approbation'
+        approval_status_approved: 'Approuvé'
+        approval_status_pending: 'En attente d''approbation'
+        approval_status_rejected: 'Rejeté'
         board_id: 'Tableau des publications'
         user_id: 'Auteur de la publication'
         post_status_id: 'Statut de la publication'
@@ -92,7 +122,25 @@ fr:
         site_logo: 'Logo du site'
         subdomain: 'Sous-domaine'
         locale: 'Langue'
-        brand_setting: 'Afficher'
+        custom_domain: 'Domaine personnalisé'
+      tenant_setting:
+        brand_display: 'Affichage'
+        use_browser_locale: 'Use browser language'
+        is_private: 'Private site'
+        email_registration_policy: 'Email registration policy'
+        allowed_email_domains: 'Allowed email domains'
+        allow_anonymous_feedback: 'Autoriser les commentaires anonymes'
+        feedback_approval_policy: 'Politique d''approbation des commentaires'
+        show_vote_count: 'Afficher le nombre de votes aux utilisateurs'
+        show_vote_button_in_board: 'Afficher les boutons de vote sur le panneau principal'
+        hide_unused_statuses_in_filter_by_status: 'Hide unused statuses in filter by status'
+        show_powered_by: 'Afficher "Powered by Astuto"'
+        root_board_id: 'Page racine'
+        logo_links_to: 'Logo links to'
+        logo_custom_url: 'Logo custom URL'
+        show_roadmap_in_header: 'Afficher le lien de la roadmap dans l''en-tête'
+        collapse_boards_in_header: 'Fusionner les tableaux dans l''en-tête'
+        custom_css: 'Custom CSS'
       user:
         email: 'Email'
         full_name: 'Nom complet'
@@ -107,4 +155,4 @@ fr:
         blank: 'ne peut pas être vide'
         taken: 'est déjà utilisé'
         too_short: 'est trop court (au moins %{count} caractères)'
-        too_long: 'is too long (maximum %{count} characters)'
+        too_long: 'est trop long (pas plus de %{count} caractères)'

@@ -33,7 +33,7 @@ const PostUpdateList = ({
 
     <div className="postUpdateList">
       {
-        postUpdates.length === 0 ?
+        postUpdates.length === 0 && !areLoading && !error ?
           <CenteredMutedText>{I18n.t('post.updates_box.empty')}</CenteredMutedText>
         :
           null
@@ -65,7 +65,9 @@ const PostUpdateList = ({
               }
             </div>
 
-            <MutedText>{friendlyDate(postUpdate.createdAt)}</MutedText>
+            <span className="mutedText" title={postUpdate.createdAt}>
+              {friendlyDate(postUpdate.createdAt)}
+            </span>
           </div>
         ))
       }

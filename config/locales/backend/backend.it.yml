@@ -2,6 +2,7 @@ it:
   errors:
     unknown: 'Si è verificato un errore sconosciuto'
     unauthorized: 'Non sei autorizzato'
+    email_domain_not_allowed: 'Non puoi registrarti con l''indirizzo email fornito'
     not_logged_in: 'Devi effettuare l''accesso per visualizzare questa pagina'
     not_enough_privileges: 'Non hai i privilegi necessari per visualizzare questa pagina'
     user_blocked_or_deleted: 'Non puoi accedere al tuo account perché è stato bloccato o eliminato.'
@@ -12,6 +13,7 @@ it:
       update_order: 'Si è verificato un errore durante il riordinamento degli stati'
   defaults:
     user_full_name: 'Utente Anonimo'
+    deleted_user_full_name: 'Utente Eliminato'
   mailers:
     devise:
       welcome_greeting: 'Benvenuto su %{site_name}, %{email}!'
@@ -30,23 +32,47 @@ it:
         body3: "La tua password non sarà modificata finché non cliccherai sul link qua sopra e ne creerai una nuova."
         action: 'Cambia la mia password'
     user:
-      opening_greeting: 'Ciao!'
+      opening_greeting: 'Ciao %{name}!'
       closing_greeting: 'Buona giornata!'
       learn_more: 'Clicca qui per saperne di più'
-      unsubscribe: 'Non vuoi più ricevere notifiche? Clicca qui'
+      unsubscribe_from_post_html: 'Non vuoi più ricevere notifiche su questo post? Clicca %{href}'
+      unsubscribe_from_site_html: 'Non vuoi più ricevere alcuna notifica? Clicca %{href}'
+      unsubscribe_link: 'qui'
       notify_post_owner:
-        subject: '[%{app_name}] Nuovo commento al tuo post %{post}'
-        body: '%{user} ha commentato il tuo post %{post}'
+        subject: '[%{site_name}] Nuovo commento al tuo post %{post}"'
+        body_html: '<b>%{user}</b> ha commentato il tuo post <b>%{post}</b>'
       notify_comment_owner:
-        subject: '[%{app_name}] Risposta al tuo commento nel post %{post}'
-        body: '%{user} ha risposto al tuo commento nel post %{post}'
-      notify_followers_of_post_update:
-        subject: '[%{app_name}] Nuovo aggiornamento per il post %{post}'
-        body: "C'è un nuovo aggiornamento sul post che stai seguendo %{post}"
-      notify_followers_of_post_status_change:
-        subject: '[%{app_name}] Aggiornamento stato per il post %{post}'
-        body: "Il post che segui %{post} ha un nuovo stato"
+        subject: '[%{site_name}] Risposta al tuo commento nel post %{post}"'
+        body_html: '<b>%{user}</b> ha risposto al tuo commento nel post <b>%{post}</b>'
+      notify_follower_of_post_update:
+        subject: '[%{site_name}] Nuovo aggiornamento per il post %{post}"'
+        body_html: 'C''è un nuovo aggiornamento sul post che stai seguendo <b>%{post}</b>'
+      notify_follower_of_post_status_change:
+        subject: '[%{site_name}] Aggiornamento stato per il post %{post}"'
+        body_html: 'C''è un nuovo aggiornamento sul post che stai seguendo <b>%{post}</b>'
   activerecord:
+    models:
+      board:
+        one: 'Bacheca'
+        other: 'Bacheche'
+      comment:
+        one: 'Commento'
+        other: 'Commenti'
+      like:
+        one: 'Voto'
+        other: 'Voti'
+      o_auth:
+        one: 'OAuth'
+        other: 'OAuth'
+      post_status:
+        one: 'Stato'
+        other: 'Stati'
+      post:
+        one: 'Post'
+        other: 'Post'
+      user:
+        one: 'Utente'
+        other: 'Utenti'
     attributes:
       board:
         name: 'Nome'
@@ -68,7 +94,7 @@ it:
         name: 'Nome'
         logo: 'Logo'
         is_enabled: 'Abilitato'
-        client_id: 'Client ID'
+        client_id: 'Cliente ID'
         client_secret: 'Client secret'
         authorize_url: 'Authorize URL'
         token_url: 'Token URL'
@@ -84,6 +110,10 @@ it:
       post:
         title: 'Titolo'
         description: 'Descrizione'
+        approval_status: 'Stato approvazione'
+        approval_status_approved: 'Approvato'
+        approval_status_pending: 'In attesa di approvazione'
+        approval_status_rejected: 'Rifiutato'
         board_id: 'Bacheca del post'
         user_id: 'Autore del post'
         post_status_id: 'Stato del post'
@@ -92,7 +122,25 @@ it:
         site_logo: 'Logo del sito'
         subdomain: 'Sottodominio'
         locale: 'Lingua'
-        brand_setting: 'Mostra'
+        custom_domain: 'Dominio personalizzato'
+      tenant_setting:
+        brand_display: 'Mostra'
+        use_browser_locale: 'Usa lingua del browser'
+        is_private: 'Sito privato'
+        email_registration_policy: 'Regole per registrazione con email'
+        allowed_email_domains: 'Domini email consentiti'
+        allow_anonymous_feedback: 'Consenti feedback anonimo'
+        feedback_approval_policy: 'Politica di approvazione feedback'
+        show_vote_count: 'Mostra numero voti agli utenti'
+        show_vote_button_in_board: 'Mostra pulsanti voto nella pagina bacheca'
+        hide_unused_statuses_in_filter_by_status: 'Nascondi gli stati inutilizzati nel filtro per stato'
+        show_powered_by: 'Mostra "Powered by Astuto"'
+        root_board_id: 'Pagina principale'
+        logo_links_to: 'Link del logo a'
+        logo_custom_url: 'URL personalizzato del logo'
+        show_roadmap_in_header: 'Mostra roadmap nel menu in alto'
+        collapse_boards_in_header: 'Comprimi le bacheche nel menu in alto'
+        custom_css: 'CSS personalizzato'
       user:
         email: 'E-mail'
         full_name: 'Nome e cognome'

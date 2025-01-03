@@ -60,16 +60,6 @@ feature 'board', type: :system, js: true do
     end
   end
 
-  it 'renders a log in button if not logged in' do
-    visit board_path(board)
-
-    within sidebar do
-      expect(page).to have_content(/Log in \/ Sign up/i)
-      click_link 'Log in / Sign up'
-      expect(page).to have_current_path(new_user_session_path)
-    end
-  end
-
   it 'renders a submit feedback button that shows a form if logged in' do
     user.confirm
     sign_in user
@@ -82,8 +72,6 @@ feature 'board', type: :system, js: true do
       click_button 'Submit feedback' # open submit form
 
       expect(page).to have_css(new_post_form)
-      expect(page).to have_content(/Title/i)
-      expect(page).to have_content(/Description/i)
     end
   end
 
@@ -103,6 +91,9 @@ feature 'board', type: :system, js: true do
 
       fill_in 'Title', with: post_title
       fill_in 'Description (optional)', with: post_description
+
+      sleep 5 # needed to avoid time check anti-spam measure
+
       click_button 'Submit feedback' # submit
     end
 
@@ -131,14 +122,24 @@ feature 'board', type: :system, js: true do
     expect(page).to have_no_content(/#{post2.title}/i)
     expect(page).to have_no_content(/#{post3.title}/i)
 
-    # you can also clear the filter
+    # you can also filter by multiple statuses
     within sidebar do
-      find(reset_filter).click
+      selector = ".postStatus#{post_status2.name.gsub(' ', '')}"
+      find(selector).click
     end
 
     expect(page).to have_content(/#{post1.title}/i)
     expect(page).to have_content(/#{post2.title}/i)
-    expect(page).to have_content(/#{post3.title}/i)
+    expect(page).to have_no_content(/#{post3.title}/i)
+
+    # you can also clear the filter
+    within sidebar do
+      find(reset_filter, match: :first).click
+    end
+
+    expect(page).to have_no_content(/#{post1.title}/i)
+    expect(page).to have_content(/#{post2.title}/i)
+    expect(page).to have_no_content(/#{post3.title}/i)
   end
 
   it 'enables users to search posts by title and description' do

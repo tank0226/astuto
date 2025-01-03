@@ -1,5 +1,6 @@
 class LikesController < ApplicationController
   before_action :authenticate_user!, only: [:create, :destroy]
+  before_action :check_tenant_subscription, only: [:create, :destroy]
 
   def index
     likes = Like
@@ -11,7 +12,7 @@ class LikesController < ApplicationController
       .left_outer_joins(:user)
       .where(post_id: params[:post_id])
 
-      render json: likes
+    render json: likes
   end
 
   def create
